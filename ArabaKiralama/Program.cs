@@ -5,8 +5,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Eskisini sil, bunu yapýþtýr:
+// Render'daki PostgreSQL adresini kontrol et, yoksa yereldeki SQLite'ý kullan
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                       builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (connectionString.Contains("postgres://"))
+        options.UseNpgsql(connectionString); // Render (Canlý)
+    else
+        options.UseSqlite(connectionString); // Efe Baba'nýn Bilgisayarý (Yerel)
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

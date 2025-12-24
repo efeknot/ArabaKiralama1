@@ -5,7 +5,7 @@
 namespace ArabaKiralama.Migrations
 {
     /// <inheritdoc />
-    public partial class PostgresFinalSetup : Migration
+    public partial class SonPostgresSetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

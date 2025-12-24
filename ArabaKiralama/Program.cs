@@ -3,59 +3,64 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Eskisini sil, bunu yapýþtýr:
-// Render'daki PostgreSQL adresini kontrol et, yoksa yereldeki SQLite'ý kullan
+// Render'daki PostgreSQL adresini kontrol et
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") ??
                        builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (connectionString.Contains("postgres://"))
-        options.UseNpgsql(connectionString); // Render (Canlý)
+    if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("postgres://"))
+    {
+        // RENDER ÝÇÝN ÖZEL PARÇALAMA (Format Hatasýný Çözer)
+        var databaseUri = new Uri(connectionString);
+        var userInfo = databaseUri.UserInfo.Split(':');
+
+        var npgsqlConnectionString = $"Host={databaseUri.Host};Port={databaseUri.Port};" +
+                                     $"Database={databaseUri.AbsolutePath.TrimStart('/')};" +
+                                     $"Username={userInfo[0]};Password={userInfo[1]};" +
+                                     $"SSL Mode=Require;Trust Server Certificate=True";
+
+        options.UseNpgsql(npgsqlConnectionString); // Render (Canlý)
+    }
     else
-        options.UseSqlite(connectionString); // Efe Baba'nýn Bilgisayarý (Yerel)
+    {
+        options.UseSqlite(connectionString); // Yerel Bilgisayar
+    }
 });
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-// OTOMATÝK VERÝTABANI OLUÞTURUCU (Efe Baba Özel)
+
+// OTOMATÝK VERÝTABANI OLUÞTURUCU
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // Eðer tablolar yoksa otomatik oluþturur (Migration'larý basar)
         context.Database.Migrate();
     }
     catch (Exception ex)
     {
-        // Hata olursa günlüðe yazar
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Veritabaný oluþturulurken bir hata oluþtu.");
+        logger.LogError(ex, "Veritabaný oluþturulurken hata!");
     }
 }
 
-app.Run(); // Bu zaten sende vardý, en sonda kalsýn.
+app.Run();

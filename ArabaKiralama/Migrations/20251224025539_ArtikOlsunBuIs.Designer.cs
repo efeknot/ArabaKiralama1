@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ArabaKiralama.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251224024614_SonPostgresSetup")]
-    partial class SonPostgresSetup
+    [Migration("20251224025539_ArtikOlsunBuIs")]
+    partial class ArtikOlsunBuIs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

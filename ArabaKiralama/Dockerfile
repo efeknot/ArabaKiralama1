@@ -1,13 +1,16 @@
-﻿# .NET 8 SDK kullanarak build işlemi
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
-COPY . .
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+# Önce proje dosyasını kopyala ve paketleri çek
+COPY *.csproj .
 RUN dotnet restore
-RUN dotnet publish -c Release -o out
+
+# Kalan her şeyi kopyala ve yayınla
+COPY . .
+RUN dotnet publish -c Release -o /app
 
 # Çalıştırma aşaması
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
-# ArabaKiralama.dll kısmının senin proje adınla aynı olduğundan emin ol
+COPY --from=build /app .
 ENTRYPOINT ["dotnet", "ArabaKiralama.dll"]

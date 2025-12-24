@@ -1,7 +1,7 @@
 using ArabaKiralama.Data;
 using Microsoft.EntityFrameworkCore;
 
-// 1. KRÝTÝK DÜZELTME: PostgreSQL Tarih/Saat Hatasýný Çözer (Efe Baba Özel)
+// 1. PostgreSQL Tarih/Saat Hatasýný Çözer
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,20 +12,19 @@ string connectionString;
 
 if (string.IsNullOrEmpty(rawConnectionString))
 {
-    // YEREL: Bilgisayarýnda çalýþýrken SQLite kullanýr
+    // YEREL: Bilgisayarýnýzda çalýþýrken SQLite kullanýr
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 }
 else
 {
-    // 2. KRÝTÝK DÜZELTME: CANLI (RENDER) Baðlantý Ayarlarý
+    // 2. CANLI (RENDER) Baðlantý Ayarlarý
     var uri = new Uri(rawConnectionString);
     var db = uri.AbsolutePath.TrimStart('/');
     var user = uri.UserInfo.Split(':')[0];
     var passwd = uri.UserInfo.Split(':')[1];
     var port = uri.Port > 0 ? uri.Port : 5432;
 
-    // Pooling=false ve Trust Server Certificate Render PostgreSQL için daha güvenlidir
     connectionString = $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={port};SSL Mode=Require;Trust Server Certificate=True;Pooling=false;";
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 }
@@ -43,15 +42,20 @@ app.UseAuthorization();
 
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 3. KRÝTÝK DÜZELTME: Otomatik Migration ve Veritabaný Onarýmý
+// 3. KRÝTÝK SIFIRLAMA VE KURULUM
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // Eðer tablo yapýsýnda SQLite'tan kalan bir uyumsuzluk varsa onarmaya çalýþýr
+
+        // DÝKKAT: Mevcut hatalý tablolarý siler ve her þeyi yeni modele göre kurar.
+        // Araba ekleme baþarýlý olduktan sonra bu satýrý silebilirsiniz.
+        context.Database.EnsureDeleted();
+
         context.Database.Migrate();
+        Console.WriteLine("Veritabaný PostgreSQL için baþarýyla sýfýrlandý ve kuruldu.");
     }
     catch (Exception ex)
     {

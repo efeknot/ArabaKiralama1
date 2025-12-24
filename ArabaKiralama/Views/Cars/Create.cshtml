@@ -1,0 +1,66 @@
+﻿@model ArabaKiralama.Models.Car
+@{
+    ViewData["Title"] = "Yeni Araç Ekle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-lg mt-3">
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center font-weight-light my-2">Yeni Araç Kaydı</h3>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3 mb-md-0">
+                                <input asp-for="Brand" class="form-control" placeholder="Marka giriniz" />
+                                <label for="inputBrand">Marka (Örn: BMW)</label>
+                                <span asp-validation-for="Brand" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Model" class="form-control" placeholder="Model giriniz" />
+                                <label for="inputModel">Model (Örn: 320i)</label>
+                                <span asp-validation-for="Model" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3 mb-md-0">
+                                <input asp-for="Year" class="form-control" placeholder="Yıl" type="number" />
+                                <label for="inputYear">Yıl</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3 mb-md-0">
+                                <input asp-for="Plate" class="form-control" placeholder="Plaka" />
+                                <label for="inputPlate">Plaka</label>
+                                <span asp-validation-for="Plate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="ImageUrl" class="form-control" placeholder="Fotoğraf Linki (https://...)" />
+                                <label for="inputImageUrl">Fotoğraf Linki (URL) (Örn: https://i.imgur.com/araba.jpg)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3 mb-md-0">
+                                <input asp-for="PricePerDay" class="form-control" placeholder="Fiyat" type="number" />
+                                <label for="inputPrice">Günlük Fiyat (₺)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 mb-0 d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">İptal</a>
+                        <button type="submit" class="btn btn-success px-4">Kaydet ve Yayınla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

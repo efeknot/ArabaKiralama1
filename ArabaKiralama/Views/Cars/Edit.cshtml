@@ -1,0 +1,20 @@
+﻿@model ArabaKiralama.Models.Car
+@{
+    ViewData["Title"] = "Araç Güncelle";
+}
+
+<h2>Aracı Güncelle</h2>
+<hr />
+<form asp-action="Create">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label>Marka</label> <input asp-for="Brand" class="form-control" />
+        <label>Model</label> <input asp-for="Model" class="form-control" />
+        <label>Yıl</label> <input asp-for="Year" class="form-control" />
+        <label>Plaka</label> <input asp-for="Plate" class="form-control" />
+        <label>Fiyat</label> <input asp-for="PricePerDay" class="form-control" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-warning">Değişiklikleri Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

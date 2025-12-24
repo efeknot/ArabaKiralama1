@@ -4,27 +4,27 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Render'dan gelen gizli veritabaný adresini al
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+string connectionString;
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+if (string.IsNullOrEmpty(rawConnectionString))
 {
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        // YEREL: Bilgisayarýnda çalýþýrken SQLite kullanýr
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-    }
-    else
-    {
-        // CANLI (RENDER): PostgreSQL linkini parçalar ve formatýný düzeltir
-        var uri = new Uri(connectionString);
-        var db = uri.AbsolutePath.TrimStart('/');
-        var user = uri.UserInfo.Split(':')[0];
-        var passwd = uri.UserInfo.Split(':')[1];
-        var connStr = $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={uri.Port};SSL Mode=Require;Trust Server Certificate=True;";
+    // YEREL: Bilgisayarýnda çalýþýrken SQLite kullanýr
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
+}
+else
+{
+    // CANLI (RENDER): PostgreSQL linkini parçalar ve formatýný düzeltir
+    var uri = new Uri(rawConnectionString);
+    var db = uri.AbsolutePath.TrimStart('/');
+    var user = uri.UserInfo.Split(':')[0];
+    var passwd = uri.UserInfo.Split(':')[1];
+    var port = uri.Port > 0 ? uri.Port : 5432;
 
-        options.UseNpgsql(connStr);
-    }
-});
+    connectionString = $"Server={uri.Host};Database={db};User Id={user};Password={passwd};Port={port};SSL Mode=Require;Trust Server Certificate=True;";
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+}
 
 builder.Services.AddControllersWithViews();
 var app = builder.Build();
@@ -38,14 +38,14 @@ app.UseRouting();
 app.UseAuthorization();
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// OTOMATÝK VERÝTABANI KURUCU (Burasý Çok Önemli!)
+// OTOMATÝK VERÝTABANI KURUCU
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate(); // Tablolarý Render'da otomatik oluþturur
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {

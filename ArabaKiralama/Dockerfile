@@ -1,16 +1,21 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /source
+﻿# 1. Aşama: Build (İnşaat)
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# Önce proje dosyasını kopyala ve paketleri çek
-COPY *.csproj .
-RUN dotnet restore
-
-# Kalan her şeyi kopyala ve yayınla
+# Tüm dosyaları kopyala
 COPY . .
-RUN dotnet publish -c Release -o /app
 
-# Çalıştırma aşaması
+# Proje dosyasını bul ve paketleri yükle (Klasör yapısından bağımsız çalışır)
+RUN dotnet restore "ArabaKiralama.csproj" || dotnet restore "ArabaKiralama/ArabaKiralama.csproj"
+
+# Yayınla
+RUN dotnet publish "ArabaKiralama.csproj" -c Release -o /app/publish || \
+    dotnet publish "ArabaKiralama/ArabaKiralama.csproj" -c Release -o /app/publish
+
+# 2. Aşama: Run (Çalıştırma)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app .
+COPY --from=build /app/publish .
+
+# Projenin DLL adının doğruluğundan emin ol
 ENTRYPOINT ["dotnet", "ArabaKiralama.dll"]

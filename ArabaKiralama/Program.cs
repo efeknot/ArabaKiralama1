@@ -40,5 +40,22 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+// OTOMATÝK VERÝTABANI OLUÞTURUCU (Efe Baba Özel)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        // Eðer tablolar yoksa otomatik oluþturur (Migration'larý basar)
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        // Hata olursa günlüðe yazar
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Veritabaný oluþturulurken bir hata oluþtu.");
+    }
+}
 
-app.Run();
+app.Run(); // Bu zaten sende vardý, en sonda kalsýn.

@@ -1,18 +1,18 @@
 using ArabaKiralama.Data;
 using Microsoft.EntityFrameworkCore;
 
-// 1. PostgreSQL Tarih/Saat Hatasýný Çözer
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render'dan gelen gizli veritabaný adresini al
+// Render'dan gelen gizli veritabaný adresini alma
 var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
 string connectionString;
 
 if (string.IsNullOrEmpty(rawConnectionString))
 {
-    // YEREL: Bilgisayarýnýzda çalýþýrken SQLite kullanýr
+    
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite(connectionString));
 }
@@ -50,9 +50,8 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
 
-        // DÝKKAT: Mevcut hatalý tablolarý siler ve her þeyi yeni modele göre kurar.
-        // Araba ekleme baþarýlý olduktan sonra bu satýrý silebilirsiniz.
-        context.Database.EnsureDeleted();
+       
+        
 
         context.Database.Migrate();
         Console.WriteLine("Veritabaný PostgreSQL için baþarýyla sýfýrlandý ve kuruldu.");

@@ -2,7 +2,7 @@
 WORKDIR /src
 COPY . .
 
-# PROJE DOSYASINI BULMA GARANTİSİ:
+
 RUN dotnet restore "ArabaKiralama.csproj" || dotnet restore "ArabaKiralama/ArabaKiralama.csproj"
 
 # YAYINLAMA:

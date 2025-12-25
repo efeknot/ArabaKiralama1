@@ -1,5 +1,66 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
+<div class="hero-section text-center text-white d-flex align-items-center justify-content-center">
+    <div class="container">
+        <h1 class="display-1 fw-bold mb-4" style="color: #FFD700; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); font-family: 'Arial Black', sans-serif;">
+            EFE GALERİ
+        </h1>
 
+        <p class="lead mb-5" style="font-size: 1.5rem; letter-spacing: 1px;">
+            Hayalinizdeki Araç, Güvenilir Adreste.
+        </p>
+
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8">
+                <div class="contact-box p-4" style="background-color: rgba(0,0,0,0.6); border: 2px solid #FFD700; border-radius: 15px;">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h4 style="color: #FFD700;">📍 Adresimiz</h4>
+                            <p class="mb-0" style="font-size: 1.2rem;">Mamak / ANKARA</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 style="color: #FFD700;">📞 İletişim</h4>
+                            <a href="tel:05316044712" class="text-white text-decoration-none" style="font-size: 1.2rem; transition: color 0.3s;">
+                                0531 604 4712
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/Cars" class="btn btn-lg px-5 py-3 fw-bold" style="background-color: #FFD700; color: #000; border-radius: 50px; transition: transform 0.3s;">
+            ARAÇLARI İNCELE &raquo;
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Sayfa arka planını koyu yapalım ki altın renk patlasın */
+    body {
+        background-color: #121212; /* Koyu gri/siyah */
+        background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920&auto=format&fit=crop'); /* Lüks bir araba arka planı (isteğe bağlı) */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    /* Hero bölümünün yüksekliğini ayarla */
+    .hero-section {
+        min-height: 80vh; /* Ekranın %80'ini kaplasın */
+        padding-top: 60px;
+    }
+
+    /* Telefon numarası üzerine gelince rengi değişsin */
+    .contact-box a:hover {
+        color: #FFD700 !important;
+    }
+
+    /* Butonun üzerine gelince hafifçe büyüsün */
+    .btn-lg:hover {
+        transform: scale(1.05);
+        background-color: #e6c200 !important; /* Biraz daha koyu altın */
+    }
+</style>
